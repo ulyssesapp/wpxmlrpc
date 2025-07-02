@@ -289,7 +289,7 @@ static char *NewBase64Encode(
 
 // If you change this, be sure it's a multiple of 90.
 // The base 64 encoding adds a new line every 90 characters.
-#define WPBase64UtilsChunkSize 18000
+#define BASE64_CHUNK_SIZE 18000
 
 @implementation WPBase64Utils
 + (NSString *)encodeData:(NSData *)data {
@@ -308,10 +308,10 @@ static char *NewBase64Encode(
     [stream open];
 
     while ([stream hasBytesAvailable]) {
-        uint8_t buf[WPBase64UtilsChunkSize];
+        uint8_t buf[BASE64_CHUNK_SIZE];
         NSInteger len = 0;
 
-        len = [stream read:buf maxLength:WPBase64UtilsChunkSize];
+        len = [stream read:buf maxLength:BASE64_CHUNK_SIZE];
         if (len) {
             @autoreleasepool {
                 NSData *chunk = [NSData dataWithBytes:buf length:len];
@@ -325,11 +325,11 @@ static char *NewBase64Encode(
 }
 
 + (void)encodeFileHandle:(NSFileHandle *)fileHandle withChunkHandler:(void (^)(NSString *chunk))chunkHandler {
-    NSData *chunk = [fileHandle readDataOfLength:WPBase64UtilsChunkSize];
+    NSData *chunk = [fileHandle readDataOfLength:BASE64_CHUNK_SIZE];
     while ([chunk length] > 0) {
         NSString *encodedChunk = [self encodeData:chunk];
         chunkHandler(encodedChunk);
-        chunk = [fileHandle readDataOfLength:WPBase64UtilsChunkSize];
+        chunk = [fileHandle readDataOfLength:BASE64_CHUNK_SIZE];
     }
 }
 
